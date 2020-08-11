@@ -1,0 +1,67 @@
+<!-- Featured Section Begin -->
+
+<div class="container">
+    <div class="row light-green lighten-5">
+        <div class="col">
+            <div class="section-title">
+                <h5 class="center-align">ख़ास उत्पाद</h5>
+            </div>
+            <div class="featured__controls">
+                <ul>
+                    <li class="active" data-filter=".Seed" onclick="updateViewMoreLink('Seed')" id="displaySeedOnLoad">बीज</li>
+                    <li data-filter=".Herbicide" onclick="updateViewMoreLink('Herbicide')">हर्बीसाइड</li>
+                    <li data-filter=".Fungicide" onclick="updateViewMoreLink('Fungicide')">फंगीसाइड</li>
+                    <li data-filter=".Insecticide" onclick="updateViewMoreLink('Insecticide')">इंसेक्टिसाइड</li>
+                    <li data-filter=".Fertilizer" onclick="updateViewMoreLink('Fertilizer')">खाद</li>
+                    <li data-filter=".Other" onclick="updateViewMoreLink('Other')">अन्य</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row featured__filter">
+        <% productsReveived.forEach(element => { %>
+        <div class="col s6 mix <%=element.data.category%>" style="padding: 10px;" >
+            <div class="featured__item" style="border-width:2px;border-style:solid;border-color: rgb(196, 190, 190);border-radius: 20px;height: 300px;">
+                <div class="row">
+                    <div class="col">
+                        <span class="notification-badge">-<%= Math.round(100*(element.data.varients[0].priceOriginal-element.data.varients[0].discountPrice)/element.data.varients[0].priceOriginal) %>%</span>
+                        <a href="product/<%= element.id %>">
+                            <h5 style="text-align: center;">
+                                <img class="responsive-image" src="<%= element.data.productURL %>" style="width: 120px; height: 120px; margin-top: -10px;margin-left: 10px;">
+                            </h5>
+                        </a>
+                    </div>
+                </div>
+                <div class="row cart-buttons" style="display: none;">
+                    <div class="col">
+                        <form action="cart/<%= element.id %>" method="post">
+                            <input type="hidden" name="addToCartQty" id="addToCartQty" value="1">
+                            <input type="hidden" name="addProductNameHindi" id="addProductNameHindi"
+                                value="<%= element.data.productNameHindi %>">
+                            <input type="hidden" name="addVarientName" id="addVarientName"
+                                value="<%= element.data.varients[0].varientName %>">
+                            <button type="submit"><i class="material-icons">add_shopping_cart</i></button>
+                        </form>
+                    </div>
+                    <div class="col">
+                        <a href="product/<%= element.id %>"><i class="material-icons">remove_red_eye</i></a>
+                    </div>
+                </div>
+                <div class="row featured_text ">
+                    <p style="text-align: center;margin: 0;"><%= element.data.productNameHindi %></p>
+                    <p style="text-align: center;margin: 0;"><%= element.data.company %></p>
+                    <p style="text-align: center;margin: 0;"><%= element.data.varients[0].varientName %></p>
+                    <p style="text-align: center;margin: 0;font-weight: bold;">₹ <%= element.data.varients[0].discountPrice %><span
+                            style="text-decoration: line-through; text-decoration-thickness: 1px;">
+                            ₹ <%= element.data.varients[0].priceOriginal %></span></p>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+    <div class="row">
+        <a href="/shop/Seed" class="btn green" id="viewMoreLink">View More</a>
+    </div>
+</div>
+<!-- Featured Section End -->

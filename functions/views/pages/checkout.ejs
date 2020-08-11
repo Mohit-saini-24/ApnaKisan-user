@@ -1,0 +1,78 @@
+<% layout('../boilerplate') -%>
+<% block('header', '') -%>
+<% include headerwosearch %>
+
+<table>
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Varient Name</th>
+            <th>Varient Quantity</th>    
+        </tr>
+    </thead>
+    <tbody>
+        
+        <% orderItems.forEach(item => { %>
+        <tr>
+            <td><%= item.data.productNameHindi %></td>            
+            <td><%= item.data.varientName %></td>
+            <td><%= item.data.productQty %></td>
+        </tr>    
+            <% }) %>
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="col s8">
+        <h5 style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">Order Key</h5>
+    </div>
+    
+    <div class="col s4">
+        <h4><%= randomid %></h4>
+    </div>
+</div>
+
+
+<div class="row s12">
+    <div class="col s7">
+        <h5 style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">TOTAL :</h5>
+    </div>
+    <div class="col s1">
+        <h5
+            style="border: none; font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; font-size: larger; font-weight: 500;padding: 3px;">
+            ₹</h5>
+    </div>
+    <div class="col s4">
+        <h5><%= cartTotal %></h5>
+    </div>
+</div>
+<div class="row s12">
+
+    <div class="col s7">
+        <h6
+            style="font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; padding-top: 5px;">
+            Subtotal:</h6>
+    </div>
+    <div class="col s1">
+        <h6
+            style="border: none; font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; font-size: medium; font-weight: 200;padding: 8px;">
+            ₹</h6>
+    </div>
+
+    <div class="col s4">
+        <h5><%= cartSubTotal %> </h5>
+    </div>
+</div>
+
+<div class="row s12">
+
+    <div class="col s12">
+        <a href="/" class="btn green">Continue Shopping</a>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+    $('.sidenav').sidenav();
+    })
+</script>

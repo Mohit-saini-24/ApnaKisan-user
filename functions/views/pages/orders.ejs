@@ -1,0 +1,73 @@
+<% layout('../boilerplate') -%>
+<% block('header', '') -%>
+<% include headerwosearch %>
+
+<% if (!order) { %>
+<h4>No Orders</h4>
+<% }else{ %>
+<% data.forEach(element => { %>
+<div class="row">
+    <div class="col s6">
+        <h5>Order Token</h5>
+    </div>
+    <div class="col s6">
+        <h5><%= element.orderkey %></h5>
+    </div>
+</div>
+<div class="row">
+    <div class="col s6">
+        <h5>Date</h5>
+    </div>
+    <div class="col s6">
+        <h5><%= moment(element.orderTime).format('YYYY-MM-DD') %></h5>
+    </div>
+</div>
+<div class="row">
+    <table class="striped">
+        <tr>
+            <th>Name</th>
+            <th>Varient</th>
+            <th>Qty</th>
+        </tr>
+        <% element.orderItems.forEach(item => { %>
+            <tr>
+                <td><%= item.data.productNameHindi %></td>
+                <td><%= item.data.varientName %></td>
+                <td><%= item.data.productQty %></td>
+            </tr>
+        <% }) %>
+    </table>
+</div>
+<div class="row">
+    <div class="col s6">
+        <h5>Order Total</h5>
+    </div>
+    <div class="col s6">
+        <h5><%= element.orderTotal %> </h5>
+    </div>
+</div>
+<div class="row">
+    <div class="col s6">
+        <h5>Amount to pay</h5>
+    </div>
+    <div class="col s6">
+        <h5><%= element.amountToPay %> </h5>
+    </div>
+</div>
+<div class="row">
+    <div class="col s6">
+        <h5>Total Saving </h5>
+    </div>
+    <div class="col s6">
+        <h5><%= element.saving %></h5>
+    </div>
+</div>
+<hr>
+<% }) %>
+<% } %>
+
+<script>
+    $(document).ready(function () {
+        $('.sidenav').sidenav();
+    })
+</script>

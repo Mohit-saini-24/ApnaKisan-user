@@ -1,0 +1,30 @@
+<div class="row light-green lighten-5">
+    <div class="col s12">
+        <p>राम राम जी..!!</p>
+        <p>अपना किसान में आपका स्वागत है |</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12 ">
+        <p class="center-align poster">
+            <img src="/img/poster/G.jpeg" alt="" class="responsive-img" width="360px">
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <h6>सबसे ज्यादा बिकने वाले उत्पाद</h6>
+    </div>
+</div>
+
+<div class="carousel" style="height: 200px;">
+    <% heroProducts.forEach(hero => { %>
+
+    <a class="carousel-item" href="/product/<%= hero.data.id %>">
+        <img src="<%=hero.data.data().productURL%>" alt="" width="50%">
+    </a>
+
+    <% }) %>
+</div>
+<br>

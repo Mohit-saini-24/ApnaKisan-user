@@ -1,0 +1,89 @@
+<% layout('boilerplate') -%>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mixitup/3.3.1/mixitup.min.js"></script>
+
+<% stylesheet('css/featured-product.css') -%>
+
+<% block('header', '') -%>
+
+<% include partials/materializeheader %>
+<% include partials/hero %>
+<% include partials/featuredProduct %>
+<div class="fixed-action-btn">
+    <a class="btn-floating btn-large red" href="tel:8448440572">
+        <i class="material-icons black-text">call</i>
+    </a>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelector('.carousel');
+        // var options = {
+        //     shift: 100,
+        //     fullWidth: true
+        // }
+        var instance = M.Carousel.init(elems);
+
+        setInterval(function () {
+            instance.next(1)
+        }, 10000)
+        $('.sidenav').sidenav();
+
+        // var posters = document.querySelectorAll('.poster')
+        // var i = 0;
+        // var imax = posters.length;
+        // console.log(posters.length)
+        // setInterval(function () {
+        //     if (i === imax) {
+        //         i=0;
+        //     }
+        //     posters[i].classList.remove('hidden')
+        //     console.log(i)
+        //     i = i+1;
+        //     posters[Number(i-1)].classList.add('hidden')
+        // },1000)
+
+        // document.getElementById('user-phone-number').innerText = document.cookie.split(";")[1].split("=")[1];
+
+        /*------------------
+            Gallery filter
+        --------------------*/
+        $('.set-bg').each(function () {
+            var bg = $(this).data('setbg');
+            $(this).css('background-image', 'url(' + bg + ')');
+        });
+
+        if ($('.featured__filter').length > 0) {
+            var containerEl = document.querySelector('.featured__filter');
+            var mixer = mixitup(containerEl);
+        }
+        $('.featured__controls li').on('click', function () {
+            $('.featured__controls li').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        //var uid = document.getElementById('secretid').innerText
+        document.getElementById('displaySeedOnLoad').click();
+        console.log(document.cookie)
+    });
+
+    function updateViewMoreLink(category) {
+        document.getElementById('viewMoreLink').setAttribute('href', `/shop/${category}`)
+    }
+
+    // const slider = tns({
+    //     container: '.top-products-slider',
+    //     loop: true,
+    //     items: 1,
+    //     slideBy: 'page',
+    //     nav: false,
+    //     autoplay: true,
+    //     speed: 400,
+    //     autoplayButtonOutput: false,
+    //     mouseDrag: true,
+    //     lazyload: true,
+    // });
+
+</script>
+
+<% block('footer', '') -%>
+
+<% block('pageScript').append() %>

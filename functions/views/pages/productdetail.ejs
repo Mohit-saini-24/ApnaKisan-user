@@ -1,0 +1,138 @@
+<% layout('../boilerplate') -%>
+<% block('header', '') -%>
+<% include headerwosearch %>
+
+<!-- Breadcrumb Section Begin -->
+<div class="container">
+    <div class="row" style="background-image:url('/public/img/breadcrumb.jpg') ;">
+
+        <h2 class="white-text center-align" style="padding: 10px;">Products</h2>
+        <div class="row center-align">
+            <a href="/"><i class="material-icons white-text">home</i></a>
+            <i class="material-icons white-text">trending_flat</i>
+            <a href="#"><i class="material-icons white-text">local_grocery_store</i></a>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb Section End -->
+
+<!-- Product Details Section Begin -->
+<div class="container">
+    <div class="row">
+        <div class="col s12 m6">
+            <img src="<%=product.data().productURL%>" class="responsive-img" width="280px">
+        </div>
+        <div class="col s12 m6">
+            <div class="row">
+                <h3 id="product-detail-name"><%=product.data().productName%></h3>
+            </div>
+            <div class="row">
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star-half-o"></i>
+                <span>(18 reviews)</span>
+            </div>
+            <div class="row" id="product-detail-varients">
+                <div class="col s12">
+                    <div class="row">
+                        <% product.data().varients.forEach(varient => { %>
+                        <div class="col" style="margin-top: 10px;">
+                            <button class="btn waves-effect waves-light unselected" onclick="fillVarientDetails(event)"
+                                id="<%= varient.varientName %>_<%= varient.priceOriginal %>_<%= varient.discountPrice %>_<%= varient.varientQty %>"><%= varient.varientName %></button>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <div class="col s12">
+                    <div class="row">
+                        <div class="col s4">
+                            <h6>Price:</h6>
+                        </div>
+                        <div class="col s4">
+                            <h6 id="varient-discount-price">₹ <%= product.data().varients[0].discountPrice %></h6>
+                        </div>
+                        <div class="col s4">
+                            <h6 id="varient-price"
+                                style="text-decoration: line-through; text-decoration-thickness: 1px;">₹
+                                <%= product.data().varients[0].priceOriginal %></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <form action="/cart/<%= product.id %>" method="post">
+                        <div class="input-field">
+                            <input type="number" name="addToCartQty" id="addToCartQty" placeholder="Enter Quantity"
+                                value="1">
+                        </div>
+                        <input type="hidden" name="addProductNameHindi" id="addProductNameHindi"
+                            value="<%= product.data().productName %>">
+                        <input type="hidden" name="addVarientName" id="addVarientName"
+                            value="<%= product.data().varients[0].varientName %>">
+                        <input type="submit" value="Add To Cart">
+                    </form>
+                </div>
+                <div class="col s12">
+                    <ul>
+                        <li><b>Availability</b> <span id="availability">In Stock</span></li>
+                        <li><b>Shipping</b> <span>01 day shipping. <samp>Free pickup today</samp></span></li>
+                        <li><b>Share on</b>
+                            <div class="share">
+                                <a href="whatsapp://send?text=www.apnakisan.in/product/<%= product.id%>"
+                                    data-action="share/whatsapp/share">Share via Whatsapp</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab col s3"><a class="active" href="#description">Description</a></li>
+                <li class="tab col s3"><a href="#reviews">Reviews</a></li>
+                <li class="tab col s3"><a href="#information">Information</a></li>
+            </ul>
+        </div>
+        <div id="description" class="col s12"><%=product.data().productDescription%></div>
+        <div id="reviews" class="col s12">review Content</div>
+        <div id="information" class="col s12">Information Content</div>
+    </div>
+</div>
+
+
+<!-- Product Details Section End -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.sidenav').sidenav();
+        $('.tabs').tabs();
+    })
+    function fillVarientDetails(e) {
+        var cred = e.target.id;
+        e.target.className += "green";
+        var varientName = cred.split("_")[0];
+        var varientQty = cred.split("_")[3];
+        var priceOriginal = cred.split("_")[1];
+        var discountPrice = cred.split("_")[2];
+        document.getElementById('varient-price').innerText = '₹ ' + priceOriginal
+        document.getElementById('varient-discount-price').innerText = '₹ ' + discountPrice
+        document.getElementById('addToCartQty').setAttribute("max", varientQty);
+        document.getElementById('addVarientName').value = varientName
+        if (varientQty > 0) {
+            document.getElementById('availability').innerText = 'In stock'
+        } else {
+            document.getElementById('availability').innerText = 'Out Of stock'
+        }
+    }
+</script>
+
+
+<% block('footer', '') -%>
+
+<% block('pageScript').append('') %>
