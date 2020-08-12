@@ -26,23 +26,20 @@
             instance.next(1)
         }, 10000)
         $('.sidenav').sidenav();
-
-        // var posters = document.querySelectorAll('.poster')
-        // var i = 0;
-        // var imax = posters.length;
-        // console.log(posters.length)
+        let posters = document.querySelectorAll('.poster');
+        var index = 0;
         // setInterval(function () {
-        //     if (i === imax) {
-        //         i=0;
-        //     }
-        //     posters[i].classList.remove('hidden')
-        //     console.log(i)
-        //     i = i+1;
-        //     posters[Number(i-1)].classList.add('hidden')
-        // },1000)
-
-        // document.getElementById('user-phone-number').innerText = document.cookie.split(";")[1].split("=")[1];
-
+        //     console.log(posters.length)
+        //     if (index === 0) {
+        //         posters[index].style.display = "";
+        //         index = index + 1;
+        //     } else {
+        //         posters[index - 1].style.display = "none";
+        //         posters[index].style.display = "";
+        //         index = index + 1;
+        //     };
+        //     if (index === posters.length) { posters[index - 1].style.display = "none"; index = 0; }
+        // }, 10000)
         /*------------------
             Gallery filter
         --------------------*/
@@ -62,25 +59,13 @@
 
         //var uid = document.getElementById('secretid').innerText
         document.getElementById('displaySeedOnLoad').click();
-        console.log(document.cookie)
+        // console.log(document.cookie)
     });
 
     function updateViewMoreLink(category) {
         document.getElementById('viewMoreLink').setAttribute('href', `/shop/${category}`)
     }
 
-    // const slider = tns({
-    //     container: '.top-products-slider',
-    //     loop: true,
-    //     items: 1,
-    //     slideBy: 'page',
-    //     nav: false,
-    //     autoplay: true,
-    //     speed: 400,
-    //     autoplayButtonOutput: false,
-    //     mouseDrag: true,
-    //     lazyload: true,
-    // });
 
 </script>
 

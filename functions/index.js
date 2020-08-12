@@ -395,7 +395,7 @@ app.post('/cart/:id', async (req, res) => {
             }).catch(error => res.send('increment cart error' + error));
         } else {
             var cart = {
-                productQty: 1,
+                productQty: varQty,
                 productID: productid,
                 varientName: varName,
                 productNameHindi: addProductNameHindi
@@ -406,15 +406,15 @@ app.post('/cart/:id', async (req, res) => {
         }
         return update;
     }).catch(error => res.send('index route roor........' + error))
-
+    res.redirect('/cart');
     // console.log('update..............' + updateValue)
-    if (updateValue) {
-        // return res.append('Success', 'Increment by one')
-        // return res.redirect(req.get('referer'));
-        return res.json("increment by one");
-    } else {
-        return res.json("new product added");
-    }
+    // if (updateValue) {
+    //     // return res.append('Success', 'Increment by one')
+    //     // return res.redirect(req.get('referer'));
+    //     return res.json("increment by one");
+    // } else {
+    //     return res.json("new product added");
+    // }
 })
 
 app.get('/cart', async (req, res) => {
