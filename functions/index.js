@@ -41,29 +41,29 @@ function attachCsrfToken(url, cookie, value) {
     }
 }
 
-function checkIfSignedIn(url) {
-    return function (req, res, next) {
-        if (req.url === url) {
-            const sessionCookie = req.cookies.__session || '';
-            // User already logged in. Redirect to profile page.
-            admin.auth().verifySessionCookie(sessionCookie).then(async (decodedClaims) => {
-                // const userRecord = await admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                //     return userRecord;
-                // })
-                // res.locals.user = userRecord.uid
-                // console.log('decoded claims....')
-                // console.log(userRecord.uid)
-                return res.redirect('/home');
-            }).catch((error) => {
-                console.log(error)
-                next();
-            });
-        } else {
-            next();
-            return;
-        }
+async function checkIfSignedIn(req, res, next) {
+    try {
+        const sessionCookie = req.cookies.__session || '';
+
+        // console.log('===========' + sessionCookie)
+        // if (!sessionCookie) {
+        //     return res.redirect('/')
+        // }
+        // User already logged in. Redirect to profile page.
+        const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie)
+        const userRecord = await admin.auth().getUser(decodedClaims.sub)
+
+        // console.log('decoded claims....')
+        console.log('=============================')
+        console.log(userRecord);
+        req.user = userRecord
+        return next();
+
+    } catch (error) {
+        return next();
     }
 }
+
 
 // function saveUserIP(req,res,next){
 //     console.log('user IP Adderss :' +req.ip)
@@ -74,11 +74,17 @@ app.use(cookieParser());
 
 app.use(attachCsrfToken('/', 'csrfToken', (Math.random() * 100000000000000000).toString()));
 
-app.use(checkIfSignedIn('/',));
+// app.use(checkIfSignedIn('/',));
 // app.use(saveUserIP)
 
-app.get('/', (req, res) => {
-    res.render('index')
+app.get('/', checkIfSignedIn, (req, res) => {
+    // console.log('retrived id..........')
+    // console.log(req.user)
+    if (req.user) {
+        return res.redirect('/home')
+
+    }
+    return res.render('index')
 })
 
 
@@ -139,24 +145,13 @@ app.get('/logout', (req, res) => {
     }
 });
 
-app.get('/home', async (req, res) => {
+app.get('/home', checkIfSignedIn, async (req, res) => {
     res.set('Cache-Control', 'private, max-age=31557600');
-
-    // console.log(res.locals.user)
-    // Get session cookie.
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    console.log(req.user)
+    const userRecord = req.user
 
     var heroQuery = db.collection('products').doc('All Products').collection('Products').orderBy("sold", "desc").limit(5);
 
@@ -346,21 +341,12 @@ app.get('/product/:id', async (req, res) => {
     res.render('pages/productdetail', { product: product })
 })
 
-app.post('/cart/:id', async (req, res) => {
-    // Get session cookie.
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
+app.post('/cart/:id', checkIfSignedIn, async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    console.log(req.user)
+    const userRecord = req.user
     const uid = userRecord.uid
 
     //const uid = cookie;
@@ -417,7 +403,7 @@ app.post('/cart/:id', async (req, res) => {
     // }
 })
 
-app.get('/cart', async (req, res) => {
+app.get('/cart', checkIfSignedIn, async (req, res) => {
     // Get session cookie.
     const sessionCookie = req.cookies.__session || '';
     // Get the session cookie and verify it. In this case, we are verifying if the
@@ -509,22 +495,12 @@ app.get('/cart', async (req, res) => {
 
 })
 
-app.post('/incrementCart/:id/:qty', async (req, res) => {
-
-    // Get session cookie.
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
+app.post('/incrementCart/:id/:qty', checkIfSignedIn, async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    console.log(req.user)
+    const userRecord = req.user
     const uid = userRecord.uid
 
     var cartItemId1 = req.params.id;
@@ -539,24 +515,15 @@ app.post('/incrementCart/:id/:qty', async (req, res) => {
     }).then(() => {
         return true;
     }).catch(error => res.send("unable to update cart " + error));
-    res.redirect('/cart')
+    return res.redirect('/cart')
     // [END update_document]
 })
-app.post('/decrementCart/:id/:qty', async (req, res) => {
-    // Get session cookie.
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
+app.post('/decrementCart/:id/:qty', checkIfSignedIn, async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    console.log(req.user)
+    const userRecord = req.user
     const uid = userRecord.uid
 
     var cartItemId1 = req.params.id;
@@ -572,45 +539,30 @@ app.post('/decrementCart/:id/:qty', async (req, res) => {
         return res.redirect('/cart')
     }).catch(error => res.json("unable to update cart " + error));
 })
-app.post('/removeFromCart/:id', async (req, res) => {
-    // Get session cookie.
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
-    const uid = userRecord.uid
+app.post('/removeFromCart/:id', checkIfSignedIn, async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    try {
+        const userRecord = req.user
+        const uid = userRecord.uid
 
-    var cartItemId1 = req.params.id;
-    db.collection('users').doc(uid).collection("cart")
-        .doc(cartItemId1).delete().then(() => {
-            return res.redirect('/cart');
-        }).catch(error => res.json("unable to update cart " + error));
+        var cartItemId1 = req.params.id;
+        await db.collection('users').doc(uid).collection("cart")
+            .doc(cartItemId1).delete()
+        return res.redirect('/cart');
+    } catch (error) {
+        return res.json("unable to update cart " + error)
+    }
+    // console.log(req.user)
 })
 
-app.post('/checkout', async (req, res) => {
-    // Get session cookie.
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
+app.post('/checkout', checkIfSignedIn, async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    console.log(req.user)
+    const userRecord = req.user
     const uid = userRecord.uid
 
     // final checkout query
@@ -636,8 +588,8 @@ app.post('/checkout', async (req, res) => {
     const orderItems = await cartRef.get().then((cartitems) => {
         cartitems.docs.forEach(item => {
             orderItemstemp.push({
-                id:item.id,
-                data:item.data()
+                id: item.id,
+                data: item.data()
             })
         })
         return orderItemstemp;
@@ -652,7 +604,7 @@ app.post('/checkout', async (req, res) => {
         orderTotal: cartTotal,
         amountToPay: cartSubTotal,
         saving: cartTotal - cartSubTotal,
-        orderTime:new Date()
+        orderTime: new Date()
     }).catch(error => res.send("apna kisan add order error..." + error))
 
 
@@ -664,7 +616,7 @@ app.post('/checkout', async (req, res) => {
         orderTotal: cartTotal,
         amountToPay: cartSubTotal,
         saving: cartTotal - cartSubTotal,
-        orderTime:new Date()
+        orderTime: new Date()
     }).catch(error => res.send("order add error....." + error))
     // save the contents of cart order collection of currentuser 
     //await db.collection('users').doc(uid).collection('cart').delete().then(() => { return })
@@ -702,21 +654,12 @@ app.post('/checkout', async (req, res) => {
     }
 })
 
-app.get('/orders', async (req, res) => {
-    // Get session cookie.
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
+app.get('/orders', checkIfSignedIn, async (req, res) => {
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    console.log(req.user)
+    const userRecord = req.user
     const uid = userRecord.uid
 
     order = 'a'
@@ -732,26 +675,18 @@ app.get('/orders', async (req, res) => {
         return temp;
     }).catch(error => res.send("error getting orders..." + error))
     console.log(data)
-    return res.render('pages/orders', { data, order,moment });
+    return res.render('pages/orders', { data, order, moment });
 })
 
-app.get('/shop/:category', async (req, res) => {
+app.get('/shop/:category', checkIfSignedIn, async (req, res) => {
     var category = req.params.category
     res.set('Cache-Control', 'private, max-age=31557600');
 
-    const sessionCookie = req.cookies.__session || '';
-    // Get the session cookie and verify it. In this case, we are verifying if the
-    // Firebase session was revoked, user deleted/disabled, etc.
-    const userRecord = await admin.auth().verifySessionCookie(sessionCookie, true /** check if revoked. */)
-        .then((decodedClaims) => {
-            // Serve content for signed in user.
-            return admin.auth().getUser(decodedClaims.sub).then((userRecord) => {
-                return userRecord;
-            })
-        }).catch((error) => {
-            // Force user to login.
-            res.redirect('/');
-        });
+    if (!req.user) {
+        return res.redirect('/')
+    }
+    console.log(req.user)
+    const userRecord = req.user
     const uid = userRecord.uid
 
     console.log('shop route..........' + category)
@@ -788,7 +723,7 @@ app.get('/shop/:category', async (req, res) => {
         return snapshot.docs.length;
     }).catch(error => res.send('error getting cart length...' + error))
     // res.send(category)
-    res.render('pages/shop', { searchQueryData: searchQueryData[0], categoryProducts, category, cartlength, userRecord })
+    return res.render('pages/shop', { searchQueryData: searchQueryData[0], categoryProducts, category, cartlength, userRecord })
 })
 
 
